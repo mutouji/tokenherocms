@@ -13,7 +13,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
+/**
+ * @author mutouji
+ */
 @Slf4j
 @Aspect
 @Component
@@ -54,6 +60,8 @@ public class RequestLimitContract {
                 };
                 // 这个定时器设定在time规定的时间之后会执行上面的remove方法，也就是说在这个时间后它可以重新访问
                 timer.schedule(timerTask, limit.time());
+
+                // TODO: change Timer to ScheduledExecutorService
             }
             if (count > limit.count()) {
                 log.info("用户IP[" + ip + "]访问地址[" + url + "]超过了限定的次数[" + limit.count() + "]");

@@ -11,6 +11,9 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+/**
+ * @author mutouji
+ */
 @Configuration
 @EnableSwagger2
 public class Swagger2 {
@@ -25,8 +28,9 @@ public class Swagger2 {
                 return false;
             }
         };
+        // document info
         return new Docket(DocumentationType.SWAGGER_2)
-                .apiInfo(apiInfo()) // document info
+                .apiInfo(apiInfo())
                 .select()
                 .apis(predicate)
                 .build();

@@ -8,13 +8,15 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Objects;
 
+/**
+ * @author mutouji
+ */
 @ControllerAdvice
 public class RequestExceptionHandler {
     @ExceptionHandler(value = Exception.class)
-    public ResponseEntity<RestResult> defaultErrorHandler(HttpServletRequest req, Exception e) {
+    public ResponseEntity<RestResult> defaultErrorHandler(Exception e) {
         e.printStackTrace();
         HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
         String msg = "server error, please try again later";
@@ -26,6 +28,6 @@ public class RequestExceptionHandler {
             httpStatus = HttpStatus.BAD_REQUEST;
             msg = e.getMessage();
         }
-        return new ResponseEntity(new RestResult(httpStatus.value(), msg, e.getMessage()), httpStatus);
+        return new ResponseEntity<>(new RestResult<>(httpStatus.value(), msg, e.getMessage()), httpStatus);
     }
 }

@@ -4,74 +4,97 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.delphy.tokenherocms.annotation.RequestLimit;
 import org.delphy.tokenherocms.common.Constant;
 import org.delphy.tokenherocms.common.RestResult;
 import org.delphy.tokenherocms.entity.AdminUser;
-import org.delphy.tokenherocms.util.EncryptUtil;
+import org.delphy.tokenherocms.pojo.AdminCache;
+import org.delphy.tokenherocms.repository.IAdminUserRepository;
+import org.delphy.tokenherocms.util.RequestUtil;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.apache.commons.codec.binary.Base64;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @author mutouji
+ */
 @Slf4j
 @Api(description = "通用接口")
 @RestController
 public class RootController {
-    @Autowired
-    RedissonClient redissonClient;
+    private IAdminUserRepository iAdminUserRepository;
+    private RedissonClient redissonClient;
 
-    @ApiOperation(value = "需要先获取sessionid才能登陆或注册")
-    @GetMapping("/session")
-    @RequestLimit(count=10,time=60000)
-    public RestResult<String> getSessionId(HttpServletRequest request) {
-        String sessionId = genSessionId();
-        redissonClient.getBucket(Constant.SESSION_PREFIX + sessionId).set(9527, 50, TimeUnit.MINUTES);
-        return new RestResult<String>(200, "获取成功", sessionId);
+    public RootController(@Autowired IAdminUserRepository iAdminUserRepository,
+                          @Autowired RedissonClient redissonClient) {
+        this.iAdminUserRepository = iAdminUserRepository;
+        this.redissonClient = redissonClient;
     }
 
-    // 用用户名密码对sessionid,
     @ApiOperation(value="登陆")
     @PostMapping("/login")
-    @RequestLimit(count=10, time=60000)
-    public RestResult<String> login(@RequestHeader("sid") String sessionId, @RequestBody SignInRequest signInRequest, HttpServletRequest request) throws Exception {
-        // 1. 检查sessiond是否有效
-        RBucket rBucket = redissonClient.getBucket(Constant.SESSION_PREFIX + sessionId);
-        if (rBucket.isExists()) {
-            log.info("session is exist answer={0}, account={1}", signInRequest.getAnswer(), signInRequest.getAnswer());
-        } else {
-//            log.error("session id is not exist");
-            throw new Exception("session id is not exist");
+    @RequestLimit(count=10)
+    public RestResult<String> login(@RequestBody SignInRequest signInRequest, HttpServletRequest request) {
+        RequestUtil.logRequestIpAndUrl(request);
+
+        AdminUser adminUser = iAdminUserRepository.findOneByAccount(signInRequest.getAccount());
+        if (adminUser == null) {
+            return new RestResult<>(1001, "account not exist");
+        }
+        String password = new String (Base64.decodeBase64(adminUser.getPwd()));
+        if (adminUser.getAccount().equals(signInRequest.getAccount())
+                && signInRequest.getPassword().equals(password)) {
+            String uniqueId = genUniqueId();
+            if (saveAccessToken(uniqueId, adminUser)) {
+                return new RestResult<>(0, "success", uniqueId);
+            } else {
+                return new RestResult<>(1003, "cache service error");
+            }
         }
 
-        // 2. 检查用户名和签名是否有效，有效则登陆成功
-        AdminUser adminUser = new AdminUser();
-        String password = adminUser.getPwd(); // Base64.decode(adminUser.getPwd());
-        byte[] sessionKey = EncryptUtil.hmacSHA256(sessionId.getBytes(), password.getBytes());
-        byte[] serverAnswer = EncryptUtil.hmacSHA256(sessionId.getBytes(), sessionKey);
-        String serverStr = Base64.encodeBase64String(serverAnswer);
-        if (serverStr.equalsIgnoreCase(signInRequest.getAnswer())) {
-            rBucket.expire(5, TimeUnit.MILLISECONDS);
-            // 保存
-        }
-        // 3. 如果登陆成功，则在redis中记录已登陆状态，并设置免登陆时间。
-
-        return null;
+        return new RestResult<>(1002, "password error");
     }
 
-    private String genSessionId() {
-        String uuid = UUID.randomUUID().toString();
-        return uuid;
+    @ApiOperation(value="登陆")
+    @GetMapping("/login")
+    public RestResult<AdminCache> getAdmin(@RequestHeader String uniqueId) {
+        AdminCache adminCache = getAdminCacheByToken(uniqueId);
+        if (adminCache == null) {
+            return new RestResult<>(1004, "非登陆状态");
+        } else {
+            return new RestResult<>(0, "success", adminCache);
+        }
+    }
+
+//    @Cacheable(value = Constant.ADMIN_PREFIX + "#uniqueId", condition = "#result ne null")
+
+    private AdminCache getAdminCacheByToken(final String uniqueId) {
+        RBucket<AdminCache> rBucket = redissonClient.getBucket(Constant.ADMIN_PREFIX + uniqueId);
+        log.info("do getAdminCacheByToken");
+        return rBucket.get();
+    }
+
+    private String genUniqueId() {
+        return UUID.randomUUID().toString();
+    }
+
+    private boolean saveAccessToken(String uniqueId, AdminUser adminUser) {
+        RBucket<AdminCache> rBucket = redissonClient.getBucket(Constant.ADMIN_PREFIX + uniqueId);
+        AdminCache adminCache = new AdminCache();
+        adminCache.setAccount(adminUser.getAccount());
+        adminCache.setToken(uniqueId);
+        return rBucket.trySet(adminCache, 5, TimeUnit.MINUTES);
     }
 
     @Data
     static class SignInRequest {
-        private final String answer = null;
+        private final String password = null;
         private final String account = null;
     }
 

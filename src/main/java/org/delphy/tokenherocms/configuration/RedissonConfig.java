@@ -6,15 +6,10 @@ import org.redisson.config.Config;
 import org.redisson.spring.cache.CacheConfig;
 import org.redisson.spring.cache.RedissonSpringCacheManager;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
-import org.springframework.boot.env.YamlPropertySourceLoader;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
@@ -31,13 +26,16 @@ import java.util.Map;
 // 随机值属性源：用于生成随机值;
 // 应用程序配置属性：在application.yml和中定义的属性application.properties;
 
-//@PropertySource("classpath:pipeline.properties")
-//@Configuration
-//@ConfigurationProperties(prefix = "pipeline")
+// @PropertySource("classpath:pipeline.properties")
+// @Configuration
+// @ConfigurationProperties(prefix = "pipeline")
+// @PropertySource("classpath:pipeline.yml")
 
-//@PropertySource("classpath:pipeline.yml")
+/**
+ * @author mutouji
+ */
 @Configuration
-@EnableCaching // for cache
+@EnableCaching
 public class RedissonConfig {
     @Bean(destroyMethod = "shutdown")
     RedissonClient redisson(@Value("classpath:redisson/redisson-single.yaml") Resource configFile) throws IOException {
@@ -47,7 +45,7 @@ public class RedissonConfig {
 
     @Bean
     CacheManager cacheManager(RedissonClient redissonClient) {
-        Map<String, CacheConfig> config = new HashMap<String, CacheConfig>();
+        Map<String, CacheConfig> config = new HashMap<>(16);
         // 创建一个名称为"testMap"的缓存，过期时间ttl为24分钟，同时最长空闲时maxIdleTime为12分钟。
         config.put("testMap", new CacheConfig(24*60*1000, 12*60*1000));
         return new RedissonSpringCacheManager(redissonClient, config);

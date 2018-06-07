@@ -5,6 +5,9 @@ import org.delphy.tokenherocms.util.TimeUtil;
 
 import java.io.Serializable;
 
+/**
+ * @author mutouji
+ */
 @Data
 public class RestResult<T> implements Serializable {
     private int code;
@@ -30,7 +33,7 @@ public class RestResult<T> implements Serializable {
 
     public RestResult(int code) {
         this.code = code;
-        this.msg = null;
+        this.msg = "success";
         this.data = null;
     }
 }

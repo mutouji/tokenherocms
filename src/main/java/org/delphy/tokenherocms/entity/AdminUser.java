@@ -5,6 +5,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.Id;
 
+/**
+ * @author mutouji
+ */
 @Data
 @Document(collection = "adminuser")
 public class AdminUser {
