@@ -1,8 +1,7 @@
-package org.delphy.tokenherocms.entity;
+package org.delphy.tokenherocms.repository;
 
 import org.delphy.tokenherocms.TokenherocmsApplication;
-import org.delphy.tokenherocms.repository.IUserRepository;
-import org.delphy.tokenherocms.util.TimeUtil;
+import org.delphy.tokenherocms.entity.User;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

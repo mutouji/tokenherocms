@@ -7,19 +7,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.delphy.tokenherocms.annotation.RequestLimit;
 import org.delphy.tokenherocms.common.Constant;
 import org.delphy.tokenherocms.common.RestResult;
-import org.delphy.tokenherocms.entity.AdminUser;
+import org.delphy.tokenherocms.domain.AdminUserManager;
+import org.delphy.tokenherocms.domain.UserManager;
+import org.delphy.tokenherocms.entity.User;
 import org.delphy.tokenherocms.pojo.AdminCache;
-import org.delphy.tokenherocms.repository.IAdminUserRepository;
 import org.delphy.tokenherocms.util.RequestUtil;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.apache.commons.codec.binary.Base64;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
 
 /**
  * @author mutouji
@@ -28,13 +27,13 @@ import java.util.concurrent.TimeUnit;
 @Api(description = "通用接口")
 @RestController
 public class RootController {
-    private IAdminUserRepository iAdminUserRepository;
-    private RedissonClient redissonClient;
+    private AdminUserManager adminUserManager;
+    private UserManager userManager;
 
-    public RootController(@Autowired IAdminUserRepository iAdminUserRepository,
-                          @Autowired RedissonClient redissonClient) {
-        this.iAdminUserRepository = iAdminUserRepository;
-        this.redissonClient = redissonClient;
+    public RootController(@Autowired AdminUserManager adminUserManager,
+                          @Autowired UserManager userManager) {
+        this.adminUserManager = adminUserManager;
+        this.userManager = userManager;
     }
 
     @ApiOperation(value="登陆")
@@ -42,54 +41,32 @@ public class RootController {
     @RequestLimit(count=10)
     public RestResult<String> login(@RequestBody SignInRequest signInRequest, HttpServletRequest request) {
         RequestUtil.logRequestIpAndUrl(request);
-
-        AdminUser adminUser = iAdminUserRepository.findOneByAccount(signInRequest.getAccount());
-        if (adminUser == null) {
-            return new RestResult<>(1001, "account not exist");
+        if (signInRequest == null) {
+            return new RestResult<>(1101, "param wrong format");
         }
-        String password = new String (Base64.decodeBase64(adminUser.getPwd()));
-        if (adminUser.getAccount().equals(signInRequest.getAccount())
-                && signInRequest.getPassword().equals(password)) {
-            String uniqueId = genUniqueId();
-            if (saveAccessToken(uniqueId, adminUser)) {
-                return new RestResult<>(0, "success", uniqueId);
-            } else {
-                return new RestResult<>(1003, "cache service error");
-            }
-        }
-
-        return new RestResult<>(1002, "password error");
+        return adminUserManager.login(signInRequest.getAccount(), signInRequest.getPassword());
     }
 
-    @ApiOperation(value="登陆")
+    @ApiOperation(value="获取登陆")
     @GetMapping("/login")
-    public RestResult<AdminCache> getAdmin(@RequestHeader String uniqueId) {
-        AdminCache adminCache = getAdminCacheByToken(uniqueId);
-        if (adminCache == null) {
-            return new RestResult<>(1004, "非登陆状态");
-        } else {
-            return new RestResult<>(0, "success", adminCache);
+    public RestResult<AdminCache> getAdmin(@RequestHeader String sid) {
+        return adminUserManager.getAdmin(sid);
+    }
+
+    @ApiOperation("获取按size分页后第page页上的用户")
+    @GetMapping("/users")
+    public RestResult<List<User>> getUsers(@RequestHeader String sid, Integer page, Integer size) {
+        log.info("page=" + page + ", size=" + size);
+        if (page != null && size != null) {
+            return userManager.getUsers(page, size);
         }
+        return new RestResult<>(1102, "miss page(index) or size param");
     }
 
-//    @Cacheable(value = Constant.ADMIN_PREFIX + "#uniqueId", condition = "#result ne null")
-
-    private AdminCache getAdminCacheByToken(final String uniqueId) {
-        RBucket<AdminCache> rBucket = redissonClient.getBucket(Constant.ADMIN_PREFIX + uniqueId);
-        log.info("do getAdminCacheByToken");
-        return rBucket.get();
-    }
-
-    private String genUniqueId() {
-        return UUID.randomUUID().toString();
-    }
-
-    private boolean saveAccessToken(String uniqueId, AdminUser adminUser) {
-        RBucket<AdminCache> rBucket = redissonClient.getBucket(Constant.ADMIN_PREFIX + uniqueId);
-        AdminCache adminCache = new AdminCache();
-        adminCache.setAccount(adminUser.getAccount());
-        adminCache.setToken(uniqueId);
-        return rBucket.trySet(adminCache, 5, TimeUnit.MINUTES);
+    @ApiOperation("获取用户总数")
+    @GetMapping("/userscount")
+    public RestResult<Long> getUsersCount(@RequestHeader String sid) {
+        return userManager.getUsersCount();
     }
 
     @Data

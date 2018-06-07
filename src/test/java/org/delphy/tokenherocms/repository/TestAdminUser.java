@@ -1,7 +1,7 @@
-package org.delphy.tokenherocms.entity;
+package org.delphy.tokenherocms.repository;
 
 import org.delphy.tokenherocms.TokenherocmsApplication;
-import org.delphy.tokenherocms.repository.IAdminUserRepository;
+import org.delphy.tokenherocms.entity.AdminUser;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

@@ -1,6 +1,8 @@
 package org.delphy.tokenherocms.handler;
 
+import org.delphy.tokenherocms.common.EnumError;
 import org.delphy.tokenherocms.common.RestResult;
+import org.delphy.tokenherocms.exception.DefaultException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -15,6 +17,12 @@ import java.util.Objects;
  */
 @ControllerAdvice
 public class RequestExceptionHandler {
+    @ExceptionHandler(value = DefaultException.class)
+    public ResponseEntity<RestResult> handleServiceException(DefaultException exception) {
+        EnumError errorCode = exception.getErrorCode();
+        return new ResponseEntity<>(new RestResult<>(errorCode.getCode(), errorCode.getMsg(), ""), HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity<RestResult> defaultErrorHandler(Exception e) {
         e.printStackTrace();
@@ -28,6 +36,6 @@ public class RequestExceptionHandler {
             httpStatus = HttpStatus.BAD_REQUEST;
             msg = e.getMessage();
         }
-        return new ResponseEntity<>(new RestResult<>(httpStatus.value(), msg, e.getMessage()), httpStatus);
+        return new ResponseEntity<>(new RestResult<>(httpStatus.value(), msg, ""), httpStatus);
     }
 }
