@@ -14,12 +14,28 @@ public class AdminUser {
     @Id
     private String id;
     private String account;
+    /**
+     * md5 加密
+     */
     private String pwd;
     private String url;
+    /**
+     * 1
+     */
     private Long power;
+    /**
+     * admin
+     */
     private String name;
+    /**
+     * admin
+     */
     private String duties;
     private String phone;
     private String jobNum;
+
+    // TODO: clear this field...
+//    private Array setUp;
+
     private Long create;
 }

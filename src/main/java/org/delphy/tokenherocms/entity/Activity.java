@@ -12,24 +12,24 @@ import javax.persistence.Id;
 @Document(collection = "activity")
 public class Activity {
     /**
-     * id = create time in microseconds
+     * 15236027302838709 微秒 + 4位
      */
     @Id
     private String id;
     /**
-     * 预测标题
+     * 预测EOS在20点10分的收盘价是多少？允许误差范围0.1%
      */
     private String title;
     /**
-     * 开始时间 单位秒
+     * 开始时间1,523,620,500 单位秒
      */
     private Long start;
     /**
-     * 奖金池 单位dpy
+     * 奖金池400 单位dpy
      */
     private Long pond;
     /**
-     * 持续时间 单位分钟
+     * 持续时间10 单位分钟
      */
     private Long hold;
     /**
@@ -37,27 +37,27 @@ public class Activity {
      */
     private Long lockTime;
     /**
-     * 源币种  NEO
+     * 源币种  EOS
      */
     private String pair;
     /**
-     * 参照币种  USDT
+     * 参照币种  ETH
      */
     private String base;
     /**
-     * 获取结果时间 单位秒
+     * 获取结果时间1,523,621,520 单位秒
      */
     private Long end;
     /**
-     * 数据源
+     * 数据源 币安
      */
-    private Long datasource;
+    private String datasource;
     /**
-     * 状态: 未开始0，进行中1，锁定中2，清算中3，已结束4
+     * 状态: 未开始0，进行中1，锁定中2，清算中3，已结束4, 5
      */
-    private Long state;
+    private Long status;
     /**
-     * 是否清算 默认是0
+     * 是否清算 否0, 是1
      */
     private Long isSettlement;
     /**
@@ -65,23 +65,23 @@ public class Activity {
      */
     private Long delayed;
     /**
-     *  预测结果 是扩大了多少倍？
+     *  结果 0.01805
      */
-    private Long result;
+    private Double result;
     /**
-     * 获取oracle 结果的时间 秒 ？？2018-06-04 20:11:00
+     * 获取oracle 结果的时间 秒 1,523,621,460
      */
     private Long getOracleTime;
     /**
-     * oracle id  31
+     * oracle id  102
      */
     private Long oracleId;
     /**
-     * 类型 小程序1 H5活动
+     * 类型 小程序1 H5活动2
      */
     private Long type;
     /**
-     * 本条记录的创建时间
+     * 本条记录的创建时间1,523,602,730
      */
     private Long create;
     /**

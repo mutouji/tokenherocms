@@ -67,6 +67,9 @@ import javax.persistence.Id;
 @Data
 @Document(collection = "user")
 public class User {
+    /**
+     * 15233591272898350 == 微秒 + 4位
+     */
     @Id
     private String id;
     /**
@@ -82,18 +85,9 @@ public class User {
      */
     private String avatar;
     /**
-     *
+     * 2
      */
-    private String phone;
-    /**
-     * 预测次数
-     */
-    private Long countForecast;
-    private Long victories;
-    /**
-     * 新probability，28.57%
-     */
-    private String probability;
+    private String gender;
     /**
      * 3.2
      */
@@ -103,13 +97,26 @@ public class User {
      */
     private Double totalDpy;
     /**
-     * 改价卡数量
+     * 6
      */
-    private Long countCard;
-    private Long countUseCard;
+    private Long victories;
+    private String phone;
     /**
-     * 已经使用的改价卡
+     * 1523359127 秒
      */
     private Long create;
+    /**
+     * 0
+     */
     private Long delete;
 }
+
+///**
+// * 改价卡数量
+// * private Long countCard;
+// * private Long countUseCard;
+// */
+//    /**
+//     * 预测次数
+//     */
+//    private Long countForecast;
