@@ -38,7 +38,7 @@ import java.util.Map;
 @EnableCaching
 public class RedissonConfig {
     @Bean(destroyMethod = "shutdown")
-    RedissonClient redisson(@Value("classpath:redisson/redisson-single.yaml") Resource configFile) throws IOException {
+    RedissonClient redisson(@Value("${tokenherocms_redisson_config_path:classpath:redisson/redisson-single.yaml}") Resource configFile) throws IOException {
         Config config = Config.fromYAML(configFile.getInputStream());
         return Redisson.create(config);
     }

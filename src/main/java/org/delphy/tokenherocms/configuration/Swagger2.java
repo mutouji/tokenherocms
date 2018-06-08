@@ -19,15 +19,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 public class Swagger2 {
     @Bean
     public Docket createRestApi() {
-        Predicate<RequestHandler> predicate = new Predicate<RequestHandler>() {
-            @Override
-            public boolean apply(RequestHandler input) {
-                if (input.isAnnotatedWith(ApiOperation.class)) {
-                    return true;
-                }
-                return false;
-            }
-        };
+        Predicate<RequestHandler> predicate = (input) -> input.isAnnotatedWith(ApiOperation.class);
+
         // document info
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())

@@ -3,7 +3,6 @@ package org.delphy.tokenherocms.repository;
 import org.delphy.tokenherocms.entity.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
 
 import java.util.List;
 

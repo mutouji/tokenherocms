@@ -1,8 +1,6 @@
 package org.delphy.tokenherocms.pojo;
 
 import lombok.Data;
-import org.delphy.tokenherocms.common.Constant;
-import org.springframework.cache.annotation.Cacheable;
 
 /**
  * @author mutouji
