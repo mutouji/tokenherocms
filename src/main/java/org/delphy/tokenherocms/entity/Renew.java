@@ -1,9 +1,10 @@
 package org.delphy.tokenherocms.entity;
 
 import lombok.Data;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.Id;
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -11,7 +12,7 @@ import java.util.List;
  */
 @Data
 @Document(collection = "Renew")
-public class Renew {
+public class Renew implements Serializable {
     /**
      * 15234306268076227 微秒+4位
      */

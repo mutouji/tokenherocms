@@ -24,6 +24,15 @@ public class TestBasic {
     }
 
     @Test
+    public void testFormat() {
+        Random random = new Random();
+        Integer s = random.nextInt(10000);
+        s = 5;
+        String  index = String.format("%04d", s);
+        System.out.print(index);
+    }
+
+    @Test
     public void testTimer() {
         Timer timer = new Timer();
 
@@ -57,7 +66,7 @@ public class TestBasic {
 
     @Test
     public void printTime() {
-        Long time = new Date().getTime();
-        System.out.print(time);
+        Long time = new Date().getTime() / 1000;
+        System.out.println(time);
     }
 }

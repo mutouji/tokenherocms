@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.delphy.tokenherocms.annotation.RequestLimit;
 import org.delphy.tokenherocms.common.RestResult;
-import org.delphy.tokenherocms.domain.AdminUserManager;
+import org.delphy.tokenherocms.service.AdminUserService;
 import org.delphy.tokenherocms.pojo.AdminCache;
 import org.delphy.tokenherocms.util.RequestUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +20,10 @@ import javax.servlet.http.HttpServletRequest;
 @Api(value="admin", tags={"登陆"}, description = "管理员接口")
 @RestController
 public class AdminController {
-    private AdminUserManager adminUserManager;
+    private AdminUserService adminUserService;
 
-    public AdminController(@Autowired AdminUserManager adminUserManager) {
-        this.adminUserManager = adminUserManager;
+    public AdminController(@Autowired AdminUserService adminUserService) {
+        this.adminUserService = adminUserService;
     }
 
     @ApiOperation(value="管理员登陆")
@@ -34,13 +34,13 @@ public class AdminController {
         if (signInRequest == null) {
             return new RestResult<>(1101, "param wrong format");
         }
-        return adminUserManager.login(signInRequest.getAccount(), signInRequest.getPassword());
+        return adminUserService.login(signInRequest.getAccount(), signInRequest.getPassword());
     }
 
     @ApiOperation(value="获取admin")
     @GetMapping("/login")
     public RestResult<AdminCache> getAdmin(@RequestHeader String sid) {
-        return adminUserManager.getAdmin(sid);
+        return adminUserService.getAdmin(sid);
     }
 
     @ApiModel(description = "登陆时，需要传递过来的实体")

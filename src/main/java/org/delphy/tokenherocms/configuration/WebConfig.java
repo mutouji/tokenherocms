@@ -21,7 +21,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new TokenInterceptor(redissonClient)).excludePathPatterns(
-                "/login", "/error", "/**.html","/v2/api-docs","/swagger-resources/**","/webjars/**");
+                "/login", "/error", "/**.html","/v2/api-docs","/swagger-resources/**","/webjars/**","/test/**");
         super.addInterceptors(registry);
     }
 }

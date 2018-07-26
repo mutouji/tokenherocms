@@ -2,6 +2,9 @@ package org.delphy.tokenherocms.repository;
 
 import org.delphy.tokenherocms.TokenherocmsApplication;
 import org.delphy.tokenherocms.entity.Activity;
+import org.delphy.tokenherocms.pojo.ActivityVo;
+import org.delphy.tokenherocms.service.ActivityService;
+import org.delphy.tokenherocms.util.TimeUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,11 +13,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.Random;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TokenherocmsApplication.class)
 public class TestActivity {
     @Autowired
     private IActivityRepository iActivityRepository;
+
+    @Autowired
+    private ActivityService activityService;
 
     @Before
     public void setUp() {
@@ -28,26 +36,24 @@ public class TestActivity {
 
     @Test
     public void testSave() {
-        Activity activity = new Activity();
-        activity.setId("15236027302838709");
-        activity.setTitle("预测EOS在20点10分的收盘价是多少？允许误差范围0.1%");
-        activity.setStart(1523620500L);
-        activity.setPond(400L);
-        activity.setHold(10L);
-        activity.setLockTime(5L);
-        activity.setPair("EOS");
-        activity.setBase("ETH");
-        activity.setEnd(1523621520L);
-        activity.setDatasource("币安");
-        activity.setStatus(5L);
-        activity.setIsSettlement(1L);
-        activity.setDelayed(0L);
-        activity.setResult(0.01805);
-        activity.setGetOracleTime(1523621460L);
-        activity.setOracleId(102L);
-        activity.setType(1L);
-        activity.setCreate(1523602730L);
-        activity.setDelete(0L);
-        iActivityRepository.save(activity);
+        long time = TimeUtil.getCurrentSeconds() / 60;
+        time = time * 60;
+
+        Random random = new Random();
+        for(int i = 0; i < 3; i ++) {
+            ActivityVo vo = new ActivityVo();
+            vo.setBase("USDT");
+            vo.setDatasource("币安");
+            vo.setHold(3L);
+            vo.setLockTime(1L);
+            vo.setGetOracleTime(time + i * (vo.getHold() + vo.getLockTime() + 3) * 60 + (vo.getHold() + vo.getLockTime() + 1) * 60);
+            vo.setPair("BTC");
+            vo.setPond(400L);
+            vo.setStart(time + i * (vo.getHold() + vo.getLockTime() + 3) * 60);
+            vo.setRewardRatio(0.001);
+            vo.setTitle("预测BTC在20点10分的收盘价是多少？允许误差范围0.1%");
+            vo.setType(1L);
+            activityService.createActivity(vo, 1L);
+        }
     }
 }

@@ -27,7 +27,7 @@ public class RequestExceptionHandler {
     public ResponseEntity<RestResult> defaultErrorHandler(Exception e) {
         e.printStackTrace();
         HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-        String msg = "server error, please try again later";
+        String msg = e.getMessage();
         Class exceptionClazz = e.getClass();
         if (Objects.equals(MissingServletRequestParameterException.class, exceptionClazz)) {
             msg = "incorrect parameter";

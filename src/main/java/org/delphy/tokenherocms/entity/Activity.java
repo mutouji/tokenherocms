@@ -1,16 +1,17 @@
 package org.delphy.tokenherocms.entity;
 
 import lombok.Data;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.Id;
+import java.io.Serializable;
 
 /**
  * @author mutouji
  */
 @Data
 @Document(collection = "activity")
-public class Activity {
+public class Activity implements Serializable {
     /**
      * 15236027302838709 微秒 + 4位
      */
@@ -45,7 +46,7 @@ public class Activity {
      */
     private String base;
     /**
-     * 获取结果时间1,523,621,520 单位秒
+     * 市场结束时间 start + (hold  + lockTime) * 60 + settlement time (2 * 60)
      */
     private Long end;
     /**
@@ -53,7 +54,11 @@ public class Activity {
      */
     private String datasource;
     /**
-     * 状态: 未开始0，进行中1，锁定中2，清算中3，已结束4, 5
+     * 中奖范围0.001
+     */
+    private Double rewardRatio;
+    /**
+     * 状态: 未开始1，进行中2，锁定中3，清算中4，已结束5
      */
     private Long status;
     /**
@@ -77,9 +82,14 @@ public class Activity {
      */
     private Long oracleId;
     /**
-     * 类型 小程序1 H5活动2
+     * oracle type
+     * 类型 币安1 篮球2 足球3
      */
     private Long type;
+    /**
+     * 0 微信小程序活动， 1 h5 活动
+     */
+    private Long mode;
     /**
      * 本条记录的创建时间1,523,602,730
      */

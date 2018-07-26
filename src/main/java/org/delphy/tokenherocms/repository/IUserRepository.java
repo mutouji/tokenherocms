@@ -15,5 +15,20 @@ public interface IUserRepository extends MongoRepository<User, String> {
      * @param page return page size and offset
      * @return all user in that page
      */
-    List<User> findAllByOrderByCreateDesc(Pageable page);
+    List<User> findAllByOrderByIdDesc(Pageable page);
+
+    /**
+     * get all user named in name pattern
+     * @param name user's name pattern
+     * @param page page size and offset
+     * @return all user named in name pattern
+     */
+    List<User> findByNameLikeOrderByIdDesc(String name, Pageable page);
+
+    /**
+     * return count
+     * @param name name
+     * @return count
+     */
+    Long countByNameLike(String name);
 }

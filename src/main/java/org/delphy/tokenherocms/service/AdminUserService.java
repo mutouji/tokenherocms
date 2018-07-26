@@ -1,4 +1,4 @@
-package org.delphy.tokenherocms.domain;
+package org.delphy.tokenherocms.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
@@ -20,12 +20,12 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Service
-public class AdminUserManager {
+public class AdminUserService {
     private IAdminUserRepository iAdminUserRepository;
     private RedissonClient redissonClient;
 
-    public AdminUserManager(@Autowired IAdminUserRepository iAdminUserRepository,
-                          @Autowired RedissonClient redissonClient) {
+    public AdminUserService(@Autowired IAdminUserRepository iAdminUserRepository,
+                            @Autowired RedissonClient redissonClient) {
         this.iAdminUserRepository = iAdminUserRepository;
         this.redissonClient = redissonClient;
     }
@@ -69,7 +69,7 @@ public class AdminUserManager {
         AdminCache adminCache = new AdminCache();
         adminCache.setAccount(adminUser.getAccount());
         adminCache.setToken(uniqueId);
-        return rBucket.trySet(adminCache, 5, TimeUnit.MINUTES);
+        return rBucket.trySet(adminCache, 60, TimeUnit.MINUTES);
     }
 
     private String genUniqueId() {

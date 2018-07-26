@@ -1,26 +1,23 @@
 package org.delphy.tokenherocms.entity;
 
 import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.Id;
+import java.io.Serializable;
 import java.util.List;
 
-/**
- * price used in id
- */
-@Data
-class Price {
-    private Double price;
-    private String rate;
-    private Long time;
-}
 /**
  * @author mutouji
  */
 @Data
 @Document(collection = "forecast")
-public class Forecast {
+@CompoundIndexes({
+        @CompoundIndex(name="user_activity", def = "{activityId: -1, userId: -1}")
+})
+public class Forecast implements Serializable {
     /**
      * 17位 15258669902305444
      */
@@ -35,21 +32,19 @@ public class Forecast {
      */
     private String activityId;
     /**
-     * 0
-     * TODO: freeNum是啥意思
+     * 0 剩余预测次数，默认为2
      */
     private Long freeNum;
     /**
      * 0
      */
-    private Long reward;
+    private Double reward;
     /**
      * 1,525,867,882
      */
     private Long rewardTime;
     /**
-     * 0.001
-     * TODO: 啥意思
+     * 获益比例 0.99 ==> 99%
      */
     private Double rewardRatio;
     /**
@@ -67,4 +62,5 @@ public class Forecast {
      */
     private Long create;
     private Long delete;
+
 }

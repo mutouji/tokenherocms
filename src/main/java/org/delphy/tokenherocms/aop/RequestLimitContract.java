@@ -1,6 +1,7 @@
 package org.delphy.tokenherocms.aop;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -9,13 +10,8 @@ import org.delphy.tokenherocms.exception.RequestLimitException;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.*;
 
 /**
  * @author mutouji
@@ -24,16 +20,18 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 @Aspect
 @Component
 public class RequestLimitContract {
-    private Map<String, Integer> redisTemplate = new HashMap<>();
+    private Map<String, Integer> redisTemplate = new ConcurrentHashMap<>();
+    private final ScheduledExecutorService scheduledExecutorService = new ScheduledThreadPoolExecutor(8,
+            new BasicThreadFactory.Builder().namingPattern("request-limit-pool-%d").daemon(true).build());
 
     @Before("within(org.delphy.tokenherocms.controller.*) && @annotation(limit)")
     public void requestLimit(final JoinPoint joinPoint, RequestLimit limit) throws RequestLimitException {
         try {
             Object[] args = joinPoint.getArgs();
             HttpServletRequest request = null;
-            for (int i = 0; i < args.length; i++) {
-                if (args[i] instanceof HttpServletRequest) {
-                    request = (HttpServletRequest) args[i];
+            for (Object arg : args) {
+                if (arg instanceof HttpServletRequest) {
+                    request = (HttpServletRequest) arg;
                     break;
                 }
             }
@@ -50,18 +48,7 @@ public class RequestLimitContract {
             }
             int count = redisTemplate.get(key);
             if (count > 0) {
-                // 创建一个定时器
-                Timer timer = new Timer();
-                TimerTask timerTask = new TimerTask() {
-                    @Override
-                    public void run() {
-                        redisTemplate.remove(key);
-                    }
-                };
-                // 这个定时器设定在time规定的时间之后会执行上面的remove方法，也就是说在这个时间后它可以重新访问
-                timer.schedule(timerTask, limit.time());
-
-                // TODO: change Timer to ScheduledExecutorService
+                scheduledExecutorService.schedule(() -> redisTemplate.remove(key), limit.time(), TimeUnit.MILLISECONDS);
             }
             if (count > limit.count()) {
                 log.info("用户IP[" + ip + "]访问地址[" + url + "]超过了限定的次数[" + limit.count() + "]");

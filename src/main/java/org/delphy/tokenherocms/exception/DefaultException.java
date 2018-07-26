@@ -2,6 +2,9 @@ package org.delphy.tokenherocms.exception;
 
 import org.delphy.tokenherocms.common.EnumError;
 
+/**
+ * @author mutouji
+ */
 public class DefaultException extends RuntimeException {
     private EnumError errorCode;
 

@@ -10,6 +10,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
@@ -37,8 +38,12 @@ import java.util.Map;
 @Configuration
 @EnableCaching
 public class RedissonConfig {
+    /**
+     * redisson @Value("${tokenherocms_redisson_config_path:classpath:redisson/redisson-single.yaml}") Resource configFile
+     */
     @Bean(destroyMethod = "shutdown")
-    RedissonClient redisson(@Value("${tokenherocms_redisson_config_path:classpath:redisson/redisson-single.yaml}") Resource configFile) throws IOException {
+    RedissonClient redisson(@Value("${spring.profiles.active}") String profile) throws IOException {
+        Resource configFile = new ClassPathResource("redisson-" + profile + ".yaml");
         Config config = Config.fromYAML(configFile.getInputStream());
         return Redisson.create(config);
     }

@@ -6,8 +6,9 @@ import org.springframework.context.annotation.PropertySource;
 
 /**
  * @author mutouji
+ * @PropertySource("file:${tokenherocms_config_path:D:/tokenhero/tokenherocms/src/main/resources}/application.properties")
  */
-@PropertySource("file:${tokenherocms_config_path:D:/tokenhero/tokenherocms/src/main/resources}/application.properties")
+
 @SpringBootApplication
 public class TokenherocmsApplication {
 

@@ -32,7 +32,7 @@ public class TestAdminUser {
         adminUser.setAccount("admin");
         adminUser.setId("1");
         adminUser.setPwd("RHB5NjY2ODg4NjY2RHB5");
-        iAdminUserRepository.save(adminUser);
+        iAdminUserRepository.insert(adminUser);
     }
 
     @Test

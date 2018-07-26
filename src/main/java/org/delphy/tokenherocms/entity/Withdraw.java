@@ -1,16 +1,17 @@
 package org.delphy.tokenherocms.entity;
 
 import lombok.Data;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.Id;
+import java.io.Serializable;
 
 /**
  * @author mutouji
  */
 @Data
 @Document(collection = "withdraw")
-public class Withdraw {
+public class Withdraw implements Serializable {
     /**
      * 15271451776124313  微秒 + 4位
      */
@@ -20,6 +21,10 @@ public class Withdraw {
      * 运气
      */
     private String name;
+    /**
+     * 手机号
+     */
+    private String phone;
     /**
      * 15256961166880919--- 微秒 + 4位
      */
@@ -33,6 +38,10 @@ public class Withdraw {
      */
     private Double count;
     /**
+     * default = 1;
+     */
+    private Double fee;
+    /**
      * 0 未打 1 已打
      */
     private Long status;
@@ -44,4 +53,8 @@ public class Withdraw {
      * 0
      */
     private Long delete;
+
+    public Withdraw() {
+        fee = 1.0;
+    }
 }

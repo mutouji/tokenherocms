@@ -1,16 +1,17 @@
 package org.delphy.tokenherocms.entity;
 
 import lombok.Data;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.Id;
+import java.io.Serializable;
 
 /**
  * @author mutouji
  */
 @Data
 @Document(collection = "adminuser")
-public class AdminUser {
+public class AdminUser implements Serializable {
     @Id
     private String id;
     private String account;
@@ -33,9 +34,6 @@ public class AdminUser {
     private String duties;
     private String phone;
     private String jobNum;
-
-    // TODO: clear this field...
-//    private Array setUp;
 
     private Long create;
 }

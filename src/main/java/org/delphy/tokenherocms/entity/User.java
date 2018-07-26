@@ -1,10 +1,11 @@
 package org.delphy.tokenherocms.entity;
 
 import lombok.Data;
-import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.Id;
+import java.io.Serializable;
 
 //{
 //        "ret": true,
@@ -66,7 +67,7 @@ import javax.persistence.Id;
  */
 @Data
 @Document(collection = "user")
-public class User {
+public class User implements Serializable {
     /**
      * 15233591272898350 == 微秒 + 4位
      */
@@ -85,9 +86,9 @@ public class User {
      */
     private String avatar;
     /**
-     * 2
+     * 2  == 1 男 2女 0未知
      */
-    private String gender;
+    private Long gender;
     /**
      * 3.2
      */
@@ -100,6 +101,8 @@ public class User {
      * 6
      */
     private Long victories;
+    private Long participates;
+    @Indexed(unique = true)
     private String phone;
     /**
      * 1523359127 秒

@@ -1,16 +1,17 @@
 package org.delphy.tokenherocms.entity;
 
 import lombok.Data;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.Id;
+import java.io.Serializable;
 
 /**
  * @author mutouji
  */
 @Data
 @Document(collection = "card")
-public class Card {
+public class Card implements Serializable {
     @Id
     private String id;
     private String userId;
